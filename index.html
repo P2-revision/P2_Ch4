@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小二常識：交朋結友大冒險 🌟 互動答題小遊戲</title>
+  <style>
+    :root {
+      --primary: #4A90E2;
+      --secondary: #F5A623;
+      --success: #7ED321;
+      --danger: #FF5A5F;
+      --purple: #9013FE;
+      --bg: #F0F8FF;
+      --card-bg: #FFFFFF;
+      --text: #2C3E50;
+      --border-radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+      font-family: "PingFang HK", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #E0F7FA 0%, #FFF9C4 50%, #FCE4EC 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      color: var(--text);
+    }
+
+    .game-container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 680px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
+      border: 4px solid #B3E5FC;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* 頂部裝飾條 */
+    .header-bar {
+      background: linear-gradient(90deg, #4FC3F7, #4DD0E1, #81C784);
+      padding: 14px 20px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .game-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .badge-score {
+      background: rgba(255, 255, 255, 0.95);
+      color: #E65100;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 進度條 */
+    .progress-wrap {
+      background: #E1F5FE;
+      height: 12px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .progress-bar {
+      background: linear-gradient(90deg, #FFB300, #4CAF50);
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* 主內容區 */
+    .screen {
+      padding: 24px;
+      display: none;
+      flex-direction: column;
+      animation: fadeIn 0.3s ease;
+    }
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 首頁開始介面 */
+    .welcome-box {
+      text-align: center;
+      padding: 20px 10px;
+    }
+    .avatar-hero {
+      font-size: 4.5rem;
+      margin-bottom: 12px;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .welcome-title {
+      font-size: 1.7rem;
+      color: #0277BD;
+      margin-bottom: 12px;
+      font-weight: 800;
+    }
+    .welcome-desc {
+      font-size: 1.05rem;
+      color: #546E7A;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      background: #FFFDE7;
+      padding: 14px;
+      border-radius: 12px;
+      border: 2px dashed #FFE082;
+    }
+
+    .key-points-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .point-item {
+      background: #F1F8E9;
+      border: 1px solid #C5E1A5;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      color: #33691E;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 按鈕樣式 */
+    .btn-main {
+      background: linear-gradient(180deg, #FF9800 0%, #F57C00 100%);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1.25rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(245, 124, 0, 0.4);
+      transition: all 0.2s;
+      outline: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 0 auto;
+    }
+    .btn-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(245, 124, 0, 0.5);
+    }
+    .btn-main:active {
+      transform: translateY(1px);
+    }
+
+    /* 題目區塊 */
+    .q-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .q-badge {
+      background: #E0F2F1;
+      color: #00796B;
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+    .q-count {
+      color: #78909C;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .q-scene-card {
+      background: #FFF8E1;
+      border-left: 6px solid #FFB300;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+    .scene-icon {
+      font-size: 1.4rem;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .q-scene-text {
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: #37474F;
+      line-height: 1.5;
+    }
+
+    .q-subtext {
+      font-size: 0.95rem;
+      color: #616161;
+      margin-top: 6px;
+    }
+
+    /* 選項網格 */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .opt-btn {
+      background: #FAFAFA;
+      border: 2.5px solid #CFD8DC;
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-size: 1.05rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #37474F;
+      font-weight: 600;
+    }
+    .opt-btn:hover:not(:disabled) {
+      background: #F0F4C3;
+      border-color: #AFB42B;
+      transform: scale(1.01);
+    }
+    .opt-tag {
+      background: #ECEFF1;
+      color: #546E7A;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    /* 選項正確與錯誤狀態 */
+    .opt-btn.correct {
+      background: #E8F5E9 !important;
+      border-color: #4CAF50 !important;
+      color: #2E7D32 !important;
+    }
+    .opt-btn.correct .opt-tag {
+      background: #4CAF50;
+      color: white;
+    }
+    .opt-btn.wrong {
+      background: #FFEBEE !important;
+      border-color: #EF5350 !important;
+      color: #C62828 !important;
+    }
+    .opt-btn.wrong .opt-tag {
+      background: #EF5350;
+      color: white;
+    }
+
+    /* 解釋反饋框 */
+    .feedback-box {
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      display: none;
+      animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .feedback-box.correct-fb {
+      background: #E8F5E9;
+      border: 2px solid #81C784;
+      color: #2E7D32;
+    }
+    .feedback-box.wrong-fb {
+      background: #FFF3E0;
+      border: 2px solid #FFB74D;
+      color: #D84315;
+    }
+    .feedback-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .feedback-text {
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .next-wrap {
+      text-align: right;
+    }
+
+    /* 結算頁面 */
+    .result-box {
+      text-align: center;
+      padding: 16px 8px;
+    }
+    .trophy-icon {
+      font-size: 4.5rem;
+      margin-bottom: 12px;
+      animation: pulse 1.5s infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.1); }
+    }
+    .result-heading {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #0277BD;
+      margin-bottom: 8px;
+    }
+    .result-score {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #FF6F00;
+      margin-bottom: 12px;
+    }
+    .result-comment {
+      font-size: 1.05rem;
+      color: #37474F;
+      background: #E1F5FE;
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .review-summary {
+      background: #FFFDE7;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 24px;
+      text-align: left;
+      border: 2px solid #FFE082;
+    }
+    .review-summary h4 {
+      color: #E65100;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .review-summary ul {
+      padding-left: 20px;
+      color: #455A64;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* 紙屑動畫效果 canvas */
+    #confetti-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    /* 音效開關 */
+    .sound-toggle {
+      background: rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    @media (max-width: 480px) {
+      .key-points-list {
+        grid-template-columns: 1fr;
+      }
+      .screen {
+        padding: 16px;
+      }
+      .q-scene-text {
+        font-size: 1.05rem;
+      }
+      .opt-btn {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-container">
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- 頂部資訊條 -->
+  <div class="header-bar">
+    <div class="game-title">
+      <span>🎒</span>
+      <span>交朋結友大冒險</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button class="sound-toggle" id="soundBtn" onclick="toggleSound()">🔊 音效開</button>
+      <div class="badge-score">
+        <span>⭐ 得分:</span>
+        <span id="scoreText">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 進度條 -->
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- 1. 開始介面 -->
+  <div class="screen active" id="startScreen">
+    <div class="welcome-box">
+      <div class="avatar-hero">🌈👫</div>
+      <h2 class="welcome-title">小二常識：交朋結友大冒險</h2>
+      <p class="welcome-desc">
+        各位同學仔！我們學過每個人都是獨特的，大家要互相包容。快來挑戰 8 道生活情境趣味題，化身「和睦友誼之星」吧！
+      </p>
+
+      <div class="key-points-list">
+        <div class="point-item"><span>❤️</span> 家人與朋友的重要</div>
+        <div class="point-item"><span>🎨</span> 欣賞彼此獨特長處</div>
+        <div class="point-item"><span>🤝</span> 與朋友關心與和睦</div>
+        <div class="point-item"><span>🕊️</span> 冷靜溝通解決分歧</div>
+        <div class="point-item"><span>🛡️</span> 保護身體與防冒犯</div>
+        <div class="point-item"><span>✨</span> 尊重彼此喜好身型</div>
+      </div>
+
+      <button class="btn-main" onclick="startGame()">
+        <span>🚀 開始闖關！</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. 答題介面 -->
+  <div class="screen" id="quizScreen">
+    <div class="q-meta">
+      <span class="q-badge" id="categoryBadge">情境分類</span>
+      <span class="q-count" id="questionCount">第 1 / 8 題</span>
+    </div>
+
+    <div class="q-scene-card">
+      <div class="q-scene-text">
+        <span class="scene-icon" id="sceneIcon">💡</span>
+        <span id="questionTitle">題目載入中...</span>
+      </div>
+      <div class="q-subtext" id="questionSubtext"></div>
+    </div>
+
+    <!-- 選項列表 -->
+    <div class="options-grid" id="optionsContainer">
+      <!-- 動態生成選項 -->
+    </div>
+
+    <!-- 回饋詳解框 -->
+    <div class="feedback-box" id="feedbackBox">
+      <div class="feedback-title" id="fbTitle"></div>
+      <div class="feedback-text" id="fbText"></div>
+    </div>
+
+    <!-- 下一題按鈕 -->
+    <div class="next-wrap">
+      <button class="btn-main" id="nextBtn" style="display: none;" onclick="nextQuestion()">
+        <span>下一題 ➡️</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. 結果與結算介面 -->
+  <div class="screen" id="resultScreen">
+    <div class="result-box">
+      <div class="trophy-icon" id="resultTrophy">🏆</div>
+      <h2 class="result-heading" id="resultTitle">闖關完成！</h2>
+      <div class="result-score" id="finalScoreText">100 分</div>
+      <div class="result-comment" id="resultComment">
+        太優秀了！你完全掌握了與朋友、家人和睦相處的小秘訣！
+      </div>
+
+      <div class="review-summary">
+        <h4><span>💡</span> 本課核心溫習卡 (我學會了)：</h4>
+        <ul>
+          <li><strong>家人與朋友：</strong>關心、照顧起居飲食、指導學習、陪伴鼓勵我們探索新事物。</li>
+          <li><strong>獨特與包容：</strong>每個人都有不同性格與喜好，接受同學不足，欣賞學習別人長處。</li>
+          <li><strong>平等待人：</strong>不應以性別區分喜好，也不可嘲笑他人或攻擊隊友身型。</li>
+          <li><strong>化解分歧四招：</strong>冷靜控制情緒 ➡️ 聆聽對方解釋 ➡️ 換位思考 ➡️ 一起商量解決方法。</li>
+          <li><strong>保護身體私隱：</strong>尊重別人身體，拒絕冒犯；遇到不舒服的事情告訴家長等可信成人。</li>
+        </ul>
+      </div>
+
+      <button class="btn-main" onclick="restartGame()">
+        <span>🔄 再玩一次！</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 題目資料庫（嚴格依據課文 P2 第四課「交朋結友」圖文內容編寫）
+  const quizData = [
+    {
+      category: "家人與朋友的重要",
+      icon: "🏠",
+      title: "家人每天都十分愛護我們。下列哪一項是家人關心和照顧我們的方式？",
+      subtext: "想一想課堂中爸爸媽媽是怎樣陪伴我們成長的？",
+      options: [
+        "照顧我們的起居飲食，並陪伴鼓勵我們探索新事物",
+        "要求我們把所有的顏色筆都留在家裡不可以借給同學",
+        "生氣的時候胡亂怪責小朋友，不聽小朋友說話"
+      ],
+      correct: 0,
+      explanation: "課文總結指出：家人照顧我們日常的起居飲食、指導我們學習，並陪伴和鼓勵我們探索新事物！"
+    },
+    {
+      category: "欣賞彼此獨特",
+      icon: "🎨",
+      title: "小組討論時，新同學的粵語說得不太好，想用普通話交流。我們應該怎樣做？",
+      subtext: "留意課本圖中兩位同學的禮貌對話：",
+      options: [
+        "取笑他的粵語發音不好，不跟他討論",
+        "接受同學的不足，欣賞和學習對方的長處（順道多學普通話）",
+        "叫他自己一個人坐到一旁，不要說話"
+      ],
+      correct: 1,
+      explanation: "每個人都是獨特的。課本中小朋友做得很好，因為她能接受同學的不足，也懂得欣賞和學習對方的長處！"
+    },
+    {
+      category: "關心與幫助朋友",
+      icon: "✏️",
+      title: "美勞課上，友晴發現自己忘記帶顏色筆，顯得十分著急。浩明應該怎樣做？",
+      subtext: "課本第 4 頁浩明做出了友善的榜樣：",
+      options: [
+        "嘲笑友晴粗心大意，讓老師處罰她",
+        "把自己的顏色筆主動借給友晴，互相幫助",
+        "藏起自己的筆，裝作看不見"
+      ],
+      correct: 1,
+      explanation: "在平日相處時，大家應該互相關心和幫助。浩明主動把自己的顏色筆借給友晴，做得非常好！"
+    },
+    {
+      category: "解決紛爭與分歧",
+      icon: "🕊️",
+      title: "友晴不小心弄丟了借來的筆，浩明感到生氣。老師教我們解決分歧的第一步是甚麼？",
+      subtext: "黑板上老師教了解決分歧的 4 個重要方法：",
+      options: [
+        "冷靜並控制情緒，心平氣和地聽對方解釋",
+        "大聲吵架，甚至出手推對方",
+        "永遠不跟對方做朋友"
+      ],
+      correct: 0,
+      explanation: "解決分歧四步驟：1. 冷靜並控制情緒；2. 聆聽對方的解釋；3. 從對方角度回想事情起因；4. 一起商量解決方法！"
+    },
+    {
+      category: "與家人溝通的禮貌",
+      icon: "🗣️",
+      title: "放學回家後，友晴因為丟了筆心情不好。面對媽媽提醒收拾書包，怎樣才是正確態度？",
+      subtext: "對比課本中友晴原本做得不對與改善後的做法：",
+      options: [
+        "不看媽媽，向媽媽發脾氣，怪責是媽媽沒提醒自己帶筆",
+        "說話時有禮貌、看着對方；心情不好時冷靜表達，不胡亂怪責家人",
+        "把書包扔在地上大哭大鬧"
+      ],
+      correct: 1,
+      explanation: "友晴跟別人說話時要有禮貌、看着對方。不應怪責別人，在不開心時要冷靜表達，不應發脾氣！"
+    },
+    {
+      category: "尊重喜好與打破偏見",
+      icon: "🍳",
+      title: "男同學浩軒喜歡玩煮食遊戲，希望日後當廚師。有同學笑說「女孩子才玩這種遊戲」，這對嗎？",
+      subtext: "想一想我們應該如何看待別人的興趣愛好？",
+      options: [
+        "對的，男孩子只能玩機械人和踢足球",
+        "不對！我們不應該用性別來區分喜好，應尊重並欣賞同學的理想",
+        "對的，大家都應該跟著一起取笑他"
+      ],
+      correct: 1,
+      explanation: "不對！課文指出不應該用性別來區分喜好，也不應取笑別人；應該尊重同學的喜好，請他分享喜歡的遊戲！"
+    },
+    {
+      category: "包容與鼓勵隊友",
+      icon: "🏃",
+      title: "接力比賽輸了，有同學責怪隊友「都是因為你又胖又跑得慢」，這位同學做得對嗎？",
+      subtext: "回想操場上兩位同學的對話：",
+      options: [
+        "對的，輸了就一定要找出跑得最慢的人罵一頓",
+        "不對！不應攻擊別人身型和指責能力，應包容和鼓勵隊友，陪她一起練習",
+        "不對！應該要搶走對方的獎牌"
+      ],
+      correct: 1,
+      explanation: "不對！我們不應該攻擊別人的身型，也不應隨意指責隊友的能力令其受傷。應該包容和鼓勵隊友，陪她一起訓練！"
+    },
+    {
+      category: "尊重身體與自我保護",
+      icon: "🛡️",
+      title: "玩遊戲時，如果有同學踢向或觸碰我們的私隱部位，我們應該怎樣保護自己？",
+      subtext: "保護自己是每一位小朋友都要學會的本領：",
+      options: [
+        "忍耐不作聲，繼續跟他玩這個危險的遊戲",
+        "立刻保護好私隱部位，堅決拒絕遊戲，並將事情告訴家長或老師",
+        "自己打回去跟對方在地上扭打"
+      ],
+      correct: 1,
+      explanation: "我們要尊重別人的身體，也要懂得保護自己。按著私隱部位保護自己並拒絕繼續遊戲，並將事情告訴家長等可信任的成人！"
+    }
+  ];
+
+  // 遊戲狀態變數
+  let currentIndex = 0;
+  let score = 0;
+  let answered = false;
+  let soundEnabled = true;
+
+  // Web Audio API 簡單合成音效
+  let audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+  }
+
+  function playSound(type) {
+    if (!soundEnabled) return;
+    try {
+      const ctx = getAudioCtx();
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      const now = ctx.currentTime;
+      if (type === 'correct') {
+        // 歡快清脆三連音 (Do-Mi-Sol)
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.1);
+        osc.frequency.setValueAtTime(783.99, now + 0.2);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        osc.start(now);
+        osc.stop(now + 0.4);
+      } else if (type === 'wrong') {
+        // 低音警告音
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.setValueAtTime(180, now + 0.15);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'win') {
+        // 勝利號角音
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(554.37, now + 0.12);
+        osc.frequency.setValueAtTime(659.25, now + 0.24);
+        osc.frequency.setValueAtTime(880, now + 0.36);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+        osc.start(now);
+        osc.stop(now + 0.7);
+      }
+    } catch (e) {
+      console.log('Audio not supported or blocked');
+    }
+  }
+
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById('soundBtn');
+    btn.innerHTML = soundEnabled ? '🔊 音效開' : '🔇 音效關';
+    btn.style.opacity = soundEnabled ? '1' : '0.6';
+  }
+
+  // 畫面切換
+  function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+  }
+
+  // 開始遊戲
+  function startGame() {
+    currentIndex = 0;
+    score = 0;
+    document.getElementById('scoreText').innerText = score;
+    showScreen('quizScreen');
+    loadQuestion();
+  }
+
+  // 重新開始
+  function restartGame() {
+    startGame();
+  }
+
+  // 載入當前題目
+  function loadQuestion() {
+    answered = false;
+    const q = quizData[currentIndex];
+
+    // 更新進度條
+    const progressPercent = (currentIndex / quizData.length) * 100;
+    document.getElementById('progressBar').style.width = progressPercent + '%';
+
+    // 題目資訊
+    document.getElementById('categoryBadge').innerText = q.category;
+    document.getElementById('questionCount').innerText = `第 ${currentIndex + 1} / ${quizData.length} 題`;
+    document.getElementById('sceneIcon').innerText = q.icon;
+    document.getElementById('questionTitle').innerText = q.title;
+    document.getElementById('questionSubtext').innerText = q.subtext;
+
+    // 清空回饋與下一題按鈕
+    const fbBox = document.getElementById('feedbackBox');
+    fbBox.style.display = 'none';
+    fbBox.className = 'feedback-box';
+    document.getElementById('nextBtn').style.display = 'none';
+
+    // 生成選項
+    const container = document.getElementById('optionsContainer');
+    container.innerHTML = '';
+    const tagLetters = ['A', 'B', 'C'];
+
+    q.options.forEach((optText, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.innerHTML = `<span class="opt-tag">${tagLetters[i]}</span> <span>${optText}</span>`;
+      btn.onclick = () => selectOption(i, btn);
+      container.appendChild(btn);
+    });
+  }
+
+  // 選擇選項
+  function selectOption(index, selectedBtn) {
+    if (answered) return;
+    answered = true;
+
+    const q = quizData[currentIndex];
+    const allButtons = document.querySelectorAll('.opt-btn');
+    allButtons.forEach(b => b.disabled = true);
+
+    const fbBox = document.getElementById('feedbackBox');
+    const fbTitle = document.getElementById('fbTitle');
+    const fbText = document.getElementById('fbText');
+
+    if (index === q.correct) {
+      // 答對了！
+      selectedBtn.classList.add('correct');
+      score += 10;
+      document.getElementById('scoreText').innerText = score;
+      playSound('correct');
+      triggerConfetti();
+
+      fbBox.className = 'feedback-box correct-fb';
+      fbTitle.innerHTML = '<span>🎉 答對了！太厲害了！</span>';
+      fbText.innerText = q.explanation;
+    } else {
+      // 答錯了
+      selectedBtn.classList.add('wrong');
+      allButtons[q.correct].classList.add('correct');
+      playSound('wrong');
+
+      fbBox.className = 'feedback-box wrong-fb';
+      fbTitle.innerHTML = '<span>💡 差一點點！來溫習一下重點：</span>';
+      fbText.innerText = q.explanation;
+    }
+
+    fbBox.style.display = 'block';
+
+    // 顯示「下一題」或「看成績」
+    const nextBtn = document.getElementById('nextBtn');
+    if (currentIndex === quizData.length - 1) {
+      nextBtn.innerHTML = '<span>查看總成績 🏆</span>';
+    } else {
+      nextBtn.innerHTML = '<span>下一題 ➡️</span>';
+    }
+    nextBtn.style.display = 'inline-flex';
+  }
+
+  // 前往下一題或結算
+  function nextQuestion() {
+    if (currentIndex < quizData.length - 1) {
+      currentIndex++;
+      loadQuestion();
+    } else {
+      showResults();
+    }
+  }
+
+  // 結算成績
+  function showResults() {
+    document.getElementById('progressBar').style.width = '100%';
+    showScreen('resultScreen');
+    playSound('win');
+    triggerConfetti();
+
+    const maxScore = quizData.length * 10;
+    document.getElementById('finalScoreText').innerText = `${score} / ${maxScore} 分`;
+
+    const titleEl = document.getElementById('resultTitle');
+    const commentEl = document.getElementById('resultComment');
+    const trophyEl = document.getElementById('resultTrophy');
+
+    if (score === maxScore) {
+      trophyEl.innerText = '🌟🥇';
+      titleEl.innerText = '完美通關！和諧友誼大天使！';
+      commentEl.innerText = '恭喜你！8 題全部答對！你懂得關心家人、尊重同學的獨特喜好、遇事冷靜商量，還懂得保護自己，是大家最棒的好朋友！';
+    } else if (score >= maxScore * 0.7) {
+      trophyEl.innerText = '🏅✨';
+      titleEl.innerText = '恭喜！友愛模範好學生！';
+      commentEl.innerText = '做得非常好！你掌握了大部分交朋結友的技巧。複習一下剛才答錯的題目，以後相處一定更加和諧！';
+    } else {
+      trophyEl.innerText = '🌱💪';
+      titleEl.innerText = '繼續加油！友誼小萌芽！';
+      commentEl.innerText = '多留意課本中浩明和友晴的故事，學習冷靜溝通、互相包容與保護自己的好方法，你一定能成為好朋友！';
+    }
+  }
+
+  // 簡易五彩紙屑效果 (Canvas Confetti)
+  function triggerConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight;
+
+    const pieces = [];
+    const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+
+    for (let i = 0; i < 50; i++) {
+      pieces.push({
+        x: canvas.width / 2,
+        y: canvas.height / 3,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 50 + 10,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        tilt: Math.floor(Math.random() * 10) - 10,
+        tiltAngleIncremental: Math.random() * 0.07 + 0.05,
+        tiltAngle: 0,
+        vx: (Math.random() - 0.5) * 12,
+        vy: (Math.random() - 0.7) * 12
+      });
+    }
+
+    let animationFrame;
+    let frames = 0;
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        p.tiltAngle += p.tiltAngleIncremental;
+        p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+        p.x += Math.sin(p.d);
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.3; // 重力
+
+        ctx.beginPath();
+        ctx.lineWidth = p.r / 2;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r / 4, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 4);
+        ctx.stroke();
+      });
+
+      frames++;
+      if (frames < 75) {
+        animationFrame = requestAnimationFrame(render);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        cancelAnimationFrame(animationFrame);
+      }
+    }
+    render();
+  }
+</script>
+
+</body>
+</html>
